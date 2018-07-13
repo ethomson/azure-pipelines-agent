@@ -75,8 +75,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             RecalculateExpanded(out warnings);
         }
 
-        public string Agent_BuildDirectory => Get(Constants.Variables.Agent.BuildDirectory);
-
         public TaskResult? Agent_JobStatus
         {
             get
@@ -95,14 +93,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
         public string Agent_ProxyUsername => Get(Constants.Variables.Agent.ProxyUsername);
 
         public string Agent_ProxyPassword => Get(Constants.Variables.Agent.ProxyPassword);
-
-        public string Agent_ServerOMDirectory => Get(Constants.Variables.Agent.ServerOMDirectory);
-
-        public string Agent_TempDirectory => Get(Constants.Variables.Agent.TempDirectory);
-
-        public string Agent_ToolsDirectory => Get(Constants.Variables.Agent.ToolsDirectory);
-
-        public string Agent_WorkFolder => Get(Constants.Variables.Agent.WorkFolder);
 
         public int? Build_BuildId => GetInt(BuildWebApi.BuildVariables.BuildId);
 
@@ -125,8 +115,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
         public string Build_RequestedFor => Get((BuildWebApi.BuildVariables.RequestedFor));
 
         public string Build_SourceBranch => Get(Constants.Variables.Build.SourceBranch);
-
-        public string Build_SourcesDirectory => Get(Constants.Variables.Build.SourcesDirectory);
 
         public string Build_SourceTfvcShelveset => Get(Constants.Variables.Build.SourceTfvcShelveset);
 
@@ -151,8 +139,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
         public string System_CollectionId => Get(Constants.Variables.System.CollectionId);
 
         public bool? System_Debug => GetBoolean(Constants.Variables.System.Debug);
-
-        public string System_DefaultWorkingDirectory => Get(Constants.Variables.System.DefaultWorkingDirectory);
 
         public string System_DefinitionId => Get(Constants.Variables.System.DefinitionId);
 

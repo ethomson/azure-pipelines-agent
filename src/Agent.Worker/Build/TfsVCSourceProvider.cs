@@ -122,7 +122,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             ITfsVCWorkspace[] tfWorkspaces = await tf.WorkspacesAsync();
 
             // Determine the workspace name.
-            string buildDirectory = executionContext.Variables.Agent_BuildDirectory;
+            string buildDirectory = executionContext.GetVariable(Constants.Variables.Agent.BuildDirectory, isFilePath: true);
             ArgUtil.NotNullOrEmpty(buildDirectory, nameof(buildDirectory));
             string workspaceName = $"ws_{Path.GetFileName(buildDirectory)}_{settings.AgentId}";
             executionContext.Variables.Set(Constants.Variables.Build.RepoTfvcWorkspace, workspaceName);

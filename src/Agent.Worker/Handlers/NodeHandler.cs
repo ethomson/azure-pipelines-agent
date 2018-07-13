@@ -79,13 +79,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Handlers
             string workingDirectory = Data.WorkingDirectory;
             if (string.IsNullOrEmpty(workingDirectory))
             {
-                if (!string.IsNullOrEmpty(ExecutionContext.Variables.System_DefaultWorkingDirectory))
+                workingDirectory = ExecutionContext.GetVariable(Constants.Variables.System.DefaultWorkingDirectory, isFilePath: true);
+                if (string.IsNullOrEmpty(workingDirectory))
                 {
-                    workingDirectory = ExecutionContext.Variables.System_DefaultWorkingDirectory;
-                }
-                else
-                {
-                    workingDirectory = ExecutionContext.Variables.Agent_WorkFolder;
+                    workingDirectory = HostContext.GetDirectory(WellKnownDirectory.Work);
                 }
             }
 

@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
         public Type ExtensionType => typeof(ISourceProvider);
 
         public abstract string RepositoryType { get; }
-        
+
         public virtual string GetLocalPath(IExecutionContext executionContext, RepositoryResource repository, string path)
         {
             return path;
@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
 
         public virtual void SetVariablesInEndpoint(IExecutionContext executionContext, ServiceEndpoint endpoint)
         {
-            endpoint.Data.Add(Constants.EndpointData.SourcesDirectory, executionContext.Variables.Get(Constants.Variables.Build.SourcesDirectory));
+            endpoint.Data.Add(Constants.EndpointData.SourcesDirectory, executionContext.GetVariable(Constants.Variables.Build.SourcesDirectory, isFilePath: true));
             endpoint.Data.Add(Constants.EndpointData.SourceVersion, executionContext.Variables.Get(Constants.Variables.Build.SourceVersion));
         }
 
@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             trace.Info($"Get '{name}' (not found)");
             return null;
         }
-        
+
         public virtual Task RunMaintenanceOperations(IExecutionContext executionContext, string repositoryPath)
         {
             return Task.CompletedTask;

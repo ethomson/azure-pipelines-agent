@@ -8,11 +8,16 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Container
 {
     public class ContainerInfo
     {
+        private readonly IHostContext _hostContext;
+        private readonly Tracing _trace;
         private List<MountVolume> _mountVolumes;
         private Dictionary<string, string> _pathMappings;
 
-        public ContainerInfo(Pipelines.ContainerResource container)
+        public ContainerInfo(IHostContext hostContext, Pipelines.ContainerResource container)
         {
+            this._hostContext = hostContext;
+            this._trace = _hostContext.GetTrace(nameof(ContainerInfo));
+
             this.ContainerName = container.Alias;
 
             string containerImage = container.Properties.Get<string>("image");
@@ -24,6 +29,16 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Container
             this.ContainerCreateOptions = container.Properties.Get<string>("options");
             this.SkipContainerImagePull = container.Properties.Get<bool>("localimage");
             this.ContainerEnvironmentVariables = container.Environment;
+
+#if OS_WINDOWS
+            PathMappings[hostContext.GetDirectory(WellKnownDirectory.Root)] = "C:\\__a";
+            PathMappings[hostContext.GetDirectory(WellKnownDirectory.Work)] = "C:\\__w";
+            PathMappings[hostContext.GetDirectory(WellKnownDirectory.Tools)] = "C:\\__t"; // Tool cache folder may come from ENV, so we need a unique folder to avoid collision
+#else
+            PathMappings[hostContext.GetDirectory(WellKnownDirectory.Root)] = "/__a";
+            PathMappings[hostContext.GetDirectory(WellKnownDirectory.Work)] = "/__w";
+            PathMappings[hostContext.GetDirectory(WellKnownDirectory.Tools)] = "/__t"; // Tool cache folder may come from ENV, so we need a unique folder to avoid collision
+#endif            
         }
 
         public string ContainerId { get; set; }
@@ -52,7 +67,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Container
             }
         }
 
-        public Dictionary<string, string> PathMappings
+        private Dictionary<string, string> PathMappings
         {
             get
             {

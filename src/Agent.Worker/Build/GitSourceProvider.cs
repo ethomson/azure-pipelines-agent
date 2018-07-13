@@ -408,7 +408,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
                     // prepare askpass for client cert password
                     if (!string.IsNullOrEmpty(agentCert.ClientCertificatePassword))
                     {
-                        _clientCertPrivateKeyAskPassFile = Path.Combine(executionContext.Variables.Agent_TempDirectory, $"{Guid.NewGuid()}.sh");
+                        _clientCertPrivateKeyAskPassFile = Path.Combine(HostContext.GetDirectory(WellKnownDirectory.Temp), $"{Guid.NewGuid()}.sh");
                         List<string> askPass = new List<string>();
                         askPass.Add("#!/bin/sh");
                         askPass.Add($"echo \"{agentCert.ClientCertificatePassword}\"");
@@ -1112,7 +1112,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
         public override void SetVariablesInEndpoint(IExecutionContext executionContext, ServiceEndpoint endpoint)
         {
             base.SetVariablesInEndpoint(executionContext, endpoint);
-            endpoint.Data.Add(Constants.EndpointData.SourceBranch, executionContext.Variables.Get(Constants.Variables.Build.SourceBranch));
+            endpoint.Data.Add(Constants.EndpointData.SourceBranch, executionContext.Variables.Build_SourceBranch);
         }
 
         private async Task<bool> IsRepositoryOriginUrlMatch(IExecutionContext context, string repositoryPath, Uri expectedRepositoryOriginUrl)

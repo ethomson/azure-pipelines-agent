@@ -49,7 +49,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
         // timeline record update methods
         void Start(string currentOperation = null);
         TaskResult Complete(TaskResult? result = null, string currentOperation = null, string resultCode = null);
-        void SetVariable(string name, string value, bool isSecret, bool isOutput);
+        void SetVariable(string name, string value, bool isSecret = false, bool isOutput = false, bool isFilePath = false);
+        string GetVariable(string name, bool isFilePath = false);
         void SetTimeout(TimeSpan? timeout);
         void AddIssue(Issue issue);
         void Progress(int percentage, string currentOperation = null);
@@ -212,9 +213,15 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             return Result.Value;
         }
 
-        public void SetVariable(string name, string value, bool isSecret, bool isOutput)
+        public void SetVariable(string name, string value, bool isSecret = false, bool isOutput = false, bool isFilePath = false)
         {
             ArgUtil.NotNullOrEmpty(name, nameof(name));
+
+            if (isFilePath && Container != null)
+            {
+                value = Container.TranslateToContainerPath(value);
+            }
+
             if (isOutput || OutputVariables.Contains(name))
             {
                 _record.Variables[name] = new VariableValue()
@@ -230,6 +237,18 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             else
             {
                 Variables.Set(name, value, secret: isSecret);
+            }
+        }
+
+        public string GetVariable(string name, bool isFilePath = false)
+        {
+            if (isFilePath && Container != null)
+            {
+                return Container.TranslateToHostPath(Variables.Get(name));
+            }
+            else
+            {
+                return Variables.Get(name);
             }
         }
 
@@ -385,11 +404,11 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                     Alias = "vsts_container_preview"
                 };
                 dockerContainer.Properties.Set("image", imageName);
-                Container = new ContainerInfo(dockerContainer);
+                Container = new ContainerInfo(HostContext, dockerContainer);
             }
             else if (!string.IsNullOrEmpty(message.JobContainer))
             {
-                Container = new ContainerInfo(message.Resources.Containers.Single(x => string.Equals(x.Alias, message.JobContainer, StringComparison.OrdinalIgnoreCase)));
+                Container = new ContainerInfo(HostContext, message.Resources.Containers.Single(x => string.Equals(x.Alias, message.JobContainer, StringComparison.OrdinalIgnoreCase)));
             }
             else
             {
